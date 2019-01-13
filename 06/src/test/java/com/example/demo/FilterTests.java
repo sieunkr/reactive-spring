@@ -31,4 +31,56 @@ public class FilterTests {
         Assert.assertFalse(colors.contains("blue"));
     }
 
+
+    @Test
+    public void flux_take(){
+
+        List<String> colors = new ArrayList<>();
+
+        Flux<String> flux = Flux.just("blue", "green", "orange", "purple").log();
+
+        flux.take(2)
+                .subscribe(colors::add);
+
+        Assert.assertEquals(colors.size(), 2);
+        Assert.assertTrue(colors.contains("green"));
+        Assert.assertFalse(colors.contains("orange"));
+
+    }
+
+
+    @Test
+    public void flux_skip(){
+
+        List<String> colors = new ArrayList<>();
+
+        Flux<String> flux = Flux.just("blue", "green", "orange", "purple").log();
+
+
+        flux.skip(3)
+                .subscribe(colors::add);
+
+        Assert.assertEquals(colors.size(), 1);
+
+        Assert.assertTrue(colors.contains("purple"));
+        Assert.assertFalse(colors.contains("blue"));
+
+    }
+
+    
+    @Test
+    public void flux_repeat(){
+
+        List<String> names = new ArrayList<>();
+
+        Flux<String> nameFlux = Flux.just("에디킴", "아이린").doOnEach(signal -> {
+            //TODO: signal check
+        });
+        nameFlux.repeat(2).subscribe(names::add);
+
+        Assert.assertEquals(names.size(), 6);
+
+
+    }
+
 }
