@@ -8,6 +8,7 @@ import org.reactivestreams.Subscription;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Signal;
 import reactor.test.StepVerifier;
@@ -15,6 +16,8 @@ import reactor.test.StepVerifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @RunWith(SpringRunner.class)
@@ -96,10 +99,45 @@ public class FluxSubscriberTests {
     @Test
     public void test_flux_custom_subscriber_not_complete() {
 
+    }
 
+    @Test
+    public void test_flux_custom_baseSubscriber() throws InterruptedException {
 
+        CountDownLatch latch = new CountDownLatch(1);
 
+        Flux<String> flux = Flux.just("에디킴", "아이린", "아이유", "수지");
+        List names = new ArrayList();
 
+        flux.subscribe(new BaseSubscriber<String>() {
+            
+            @Override
+            protected void hookOnSubscribe(Subscription subscription) {
+                request(1);
+
+                //super.hookOnSubscribe(subscription);
+                //subscription.request(Long.MAX_VALUE)
+            }
+
+            @Override
+            protected void hookOnNext(String value) {
+                names.add(value);
+                System.out.println(value);
+                super.hookOnNext(value);
+                request(1);
+            }
+
+            @Override
+            protected void hookOnComplete() {
+                Assert.assertEquals(names.size(),4);
+
+                Assert.assertEquals(names.get(0),"에디킴");
+                Assert.assertEquals(names.get(3),"수지");
+                super.hookOnComplete();
+            }
+        });
+
+        latch.await(1000, TimeUnit.MILLISECONDS);
     }
 
 
