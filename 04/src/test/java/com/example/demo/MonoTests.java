@@ -27,16 +27,6 @@ public class MonoTests {
         final Integer[] result = new Integer[1];
 
         Mono<Integer> mono = Mono.just(1).log()
-                /*
-                //.doOnEach(signals::add);
-                .doOnEach(new Consumer<Signal<Integer>>() {
-                    @Override
-                    public void accept(Signal<Integer> integerSignal) {
-                        signals.add(integerSignal);
-                        System.out.println("Signal... : " + integerSignal);
-                    }
-                });
-                */
                 .doOnEach(integerSignal -> {
                     signals.add(integerSignal);
                     System.out.println("Signal... : " + integerSignal);
@@ -45,13 +35,23 @@ public class MonoTests {
 
         mono.subscribe(integer -> result[0] = integer);
 
-
         Assert.assertEquals(signals.size(), 2);
         Assert.assertEquals(signals.get(0).getType().name(),"ON_NEXT");
         Assert.assertEquals(signals.get(1).getType().name(),"ON_COMPLETE");
-
         Assert.assertEquals(result[0].intValue(), 1);
     }
+
+    /*
+    //.doOnEach(signals::add);
+    .doOnEach(new Consumer<Signal<Integer>>() {
+        @Override
+        public void accept(Signal<Integer> integerSignal) {
+            signals.add(integerSignal);
+            System.out.println("Signal... : " + integerSignal);
+        }
+    });
+    */
+
 
     @Test
     public void test_mono_empty(){
@@ -70,10 +70,14 @@ public class MonoTests {
     @Test
     public void test_mono_null(){
 
+        Mono<String> result = Mono.empty();
+        Assert.assertNull(result.block());
+
+        /*
         String expected = null;
         Mono<String> result = Mono.empty();
-
         Assert.assertEquals(expected, result.block());
+        */
     }
 
 
