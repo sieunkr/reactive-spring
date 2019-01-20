@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -137,6 +138,59 @@ public class GenerateTests {
 
         //TODO: 테스트
     }
+
+
+    @Test
+    public void flux_generate_delay(){
+        Flux.generate(sink -> {
+            sink.next(System.currentTimeMillis());
+            try {
+                System.out.println("Thread ID : " + Thread.currentThread().getName());
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        })
+        .subscribe(System.out::println);
+    }
+
+    @Test
+    public void flux_generate_delay2(){
+
+        Flux.generate(
+                () -> new AtomicInteger(0),
+                (counter, sink) -> {
+                    if(counter.get() == 10) {
+                        sink.complete();
+                    }
+                    sink.next(System.currentTimeMillis());
+                    counter.incrementAndGet();
+                    try {
+                        System.out.println("Thread ID : " + Thread.currentThread().getName());
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return counter;
+                }
+        )
+        .subscribe(System.out::println);
+    }
+
+
+
+
+    @Test(expected = Exception.class)
+    public void flux_generate_more_onNext_error(){
+        Flux.generate(sink -> {
+            sink.next(System.currentTimeMillis());
+            System.out.println("java.lang.IllegalStateException: More than one call to onNext");
+            sink.next(System.currentTimeMillis());
+        })
+        .subscribe(System.out::println);
+    }
+
+    
 
 
 
