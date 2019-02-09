@@ -8,6 +8,7 @@ import org.reactivestreams.Subscription;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,6 +120,32 @@ public class FluxTests {
     }
 
 
+    @Test
+    public void test_flux_lazy(){
+        //TODO: 테스트 코드를 어떻게 짜야할지 모르겠다.
+        Flux<Integer> flux = Flux.range(1,9)
+                .flatMap(n -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return Mono.just(3 * n);
+                }).log();
+
+        System.out.println("아직 구독 안한 상황... 데이터 전달을 하지 않는다.");
+
+        flux.subscribe(value -> {
+                    System.out.println(value);
+                },
+                null,
+                () -> {
+                    System.out.println("데이터 수신 완료");
+                });
+
+        System.out.println("전체 완료...");
+
+    }
 
 
 }
