@@ -17,18 +17,34 @@ public class FilterTests {
 
 
     @Test
-    public void flux_filter(){
+    public void flux_filter_not_equals(){
 
         List<String> colors = new ArrayList<>();
 
         Flux<String> flux = Flux.just("blue", "green", "orange", "purple").log();
 
+        //blue 는 전달하지 않도록 filter 추가
         flux.filter(color -> !color.equals("blue"))
                 .subscribe(colors::add);
 
-        Assert.assertEquals(colors.size(), 3);
+        Assert.assertEquals(3, colors.size());
         Assert.assertTrue(colors.contains("green"));
         Assert.assertFalse(colors.contains("blue"));
+    }
+
+    @Test
+    public void flux_filter_equals(){
+
+        List<String> colors = new ArrayList<>();
+
+        Flux<String> flux = Flux.just("blue", "green", "orange", "purple").log();
+
+        //orange 전달
+        flux.filter(color -> color.equals("orange"))
+                .subscribe(colors::add);
+
+        Assert.assertEquals(1, colors.size());
+        Assert.assertTrue(colors.contains("orange"));
     }
 
 
@@ -39,10 +55,18 @@ public class FilterTests {
 
         Flux<String> flux = Flux.just("blue", "green", "orange", "purple").log();
 
+        /*
         flux.take(2)
                 .subscribe(colors::add);
+        */
 
-        Assert.assertEquals(colors.size(), 2);
+        flux.take(2)
+                .subscribe(colors::add,
+                        null,
+                        () -> System.out.println("onComplete 는 실행되는가? 되는데.."));
+
+
+        Assert.assertEquals(2, colors.size());
         Assert.assertTrue(colors.contains("green"));
         Assert.assertFalse(colors.contains("orange"));
 
@@ -54,20 +78,20 @@ public class FilterTests {
 
         List<String> colors = new ArrayList<>();
 
-        Flux<String> flux = Flux.just("blue", "green", "orange", "purple").log();
-
+        Flux<String> flux = Flux.just("blue","green","orange","purple")
+                .log();
 
         flux.skip(3)
                 .subscribe(colors::add);
 
-        Assert.assertEquals(colors.size(), 1);
+        Assert.assertEquals(1, colors.size());
 
         Assert.assertTrue(colors.contains("purple"));
         Assert.assertFalse(colors.contains("blue"));
 
     }
 
-    
+
     @Test
     public void flux_repeat(){
 
@@ -78,7 +102,7 @@ public class FilterTests {
         });
         nameFlux.repeat(2).subscribe(names::add);
 
-        Assert.assertEquals(names.size(), 6);
+        Assert.assertEquals(6,names.size());
 
 
     }

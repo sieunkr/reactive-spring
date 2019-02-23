@@ -25,9 +25,11 @@ public class MapTests {
         flux.map(String::toLowerCase)
                 .subscribe(names::add);
 
-        Assert.assertNotEquals(names.get(0), "EDDY");
-        Assert.assertEquals(names.get(0), "eddy");
-        Assert.assertEquals(names.get(1), "irene");
+        Assert.assertEquals(2,names.size());
+        Assert.assertEquals("eddy",names.get(0));
+        Assert.assertEquals("irene",names.get(1));
+
+        Assert.assertNotEquals("EDDY",names.get(0));
     }
 
 
@@ -45,8 +47,8 @@ public class MapTests {
 
         fullNameFlux.subscribe(names::add);
 
-        Assert.assertEquals(names.get(0), "Eddy Kim");
-        Assert.assertEquals(names.get(1), "Alice Lee");
+        Assert.assertEquals("Eddy Kim",names.get(0));
+        Assert.assertEquals( "Alice Lee",names.get(1));
     }
 
     @Test
@@ -61,10 +63,10 @@ public class MapTests {
 
         // expected : 0, 0, 1, 0, 1, 2
         List<Integer> expected = Arrays.asList(0,0,1,0,1,2);
-        Assert.assertEquals(integerList.size(),6);
+        Assert.assertEquals(6,integerList.size());
 
         //TODO:assertArrays..
-        Assert.assertTrue(integerList.equals(expected));
+        Assert.assertEquals(expected, integerList);
     }
 
     @Test
@@ -77,8 +79,13 @@ public class MapTests {
                 .subscribe(keywords::add);
 
         //expected : I, like, you, I, hate, you
-        Assert.assertEquals(keywords.size(), 6);
-        Assert.assertEquals(keywords.get(0) + " " + keywords.get(1) + " " + keywords.get(2), "I like you");
+        Assert.assertEquals(6,keywords.size());
+        Assert.assertEquals("I", keywords.get(0));
+        Assert.assertEquals("like", keywords.get(1));
+        Assert.assertEquals("you", keywords.get(2));
+        Assert.assertEquals("I like you",
+                keywords.get(0) + " " + keywords.get(1)
+                        + " " + keywords.get(2));
     }
 
     @Test
@@ -87,12 +94,12 @@ public class MapTests {
         Iterator<String> iterator = Flux.just("Eddy", "Irene").toIterable().iterator();
 
         Assert.assertTrue(iterator.hasNext());
-        Assert.assertEquals(iterator.next(), "Eddy");
+        Assert.assertEquals("Eddy", iterator.next());
 
         Assert.assertTrue(iterator.hasNext());
-        Assert.assertEquals(iterator.next(), "Irene");
+        Assert.assertEquals("Irene", iterator.next());
 
-        Assert.assertFalse(iterator.hasNext());
+        //Assert.assertFalse(iterator.hasNext());
     
     }
 
